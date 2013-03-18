@@ -48,8 +48,13 @@ The buffer-contents, which must be JSON, are transformed to
 s-expressions when this mode is started, and transformed back
 temporarily to JSON whenever the buffer is saved."
   (json-sexp-convert-buffer-to-sexp)
+  (set-buffer-modified-p nil)
   (add-hook 'before-save-hook 'json-sexp-convert-buffer-to-json nil t)
-  (add-hook 'after-save-hook 'json-sexp-convert-buffer-to-sexp nil t))
+  (add-hook 'after-save-hook 'json-sexp-after-save nil t))
+
+(defun json-sexp-after-save ()
+  (json-sexp-convert-buffer-to-sexp)
+  (set-buffer-modified-p nil))
 
 (provide 'json-sexp-mode)
 ;;; json-sexp-mode.el ends here
