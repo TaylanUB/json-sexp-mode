@@ -52,6 +52,10 @@ temporarily to JSON whenever the buffer is saved."
 
 (defun json-sexp-after-save ()
   (json-sexp-convert-buffer-to-sexp)
+  ;; Convert back and forth a second time to get the same ordering of
+  ;; objects/plists.
+  (json-sexp-convert-buffer-to-json)
+  (json-sexp-convert-buffer-to-sexp)
   (set-buffer-modified-p nil))
 
 (provide 'json-sexp-mode)
