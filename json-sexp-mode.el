@@ -27,7 +27,6 @@
 (require 'json)
 
 (defun json-sexp-convert-buffer-to-sexp ()
-  (interactive)
   (unless (zerop (buffer-size))
     (let ((data (let ((json-object-type 'plist))
                   (json-read-from-string (buffer-string)))))
@@ -35,7 +34,6 @@
       (insert (pp-to-string data)))))
 
 (defun json-sexp-convert-buffer-to-json ()
-  (interactive)
   (unless (zerop (buffer-size))
     (let ((data (car (read-from-string (buffer-string)))))
       (erase-buffer)
