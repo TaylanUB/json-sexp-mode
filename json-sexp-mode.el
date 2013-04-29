@@ -52,11 +52,25 @@ temporarily to JSON whenever the buffer is saved."
 
 (defun json-sexp-after-save ()
   (json-sexp-convert-buffer-to-sexp)
-  ;; Convert back and forth a second time to get the same ordering of
-  ;; objects/plists.
-  (json-sexp-convert-buffer-to-json)
-  (json-sexp-convert-buffer-to-sexp)
   (set-buffer-modified-p nil))
+
+(defadvice json-read-object (around preserve-order)
+  "Preserve the order of key/value pairs when converting to an
+alist or plist."
+  (setq ad-return-value
+        (let ((object ad-do-it))
+          (cond
+           ((eq json-object-type 'alist)
+            (nreverse object))
+           ((eq json-object-type 'plist)
+            (let ((reversed nil))
+              (while object
+                (setq reversed (cons (car object)
+                                     (cons (cadr object) reversed)))
+                (setq object (cddr object)))
+              reversed))
+           (t
+            object)))))
 
 (provide 'json-sexp-mode)
 ;;; json-sexp-mode.el ends here
