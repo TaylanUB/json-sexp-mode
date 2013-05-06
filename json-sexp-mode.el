@@ -26,32 +26,43 @@
 ;;; Code:
 (require 'json)
 
-(defun json-sexp-convert-buffer-to-sexp ()
-  (unless (zerop (buffer-size))
+(defun json-sexp-convert-region-to-sexp (start end)
+  "Convert region from JSON to sexps."
+  (interactive "r")
+  (unless (= start end)
     (let ((data (let ((json-object-type 'plist))
-                  (json-read-from-string (buffer-string)))))
-      (erase-buffer)
-      (insert (pp-to-string data)))))
+                  (json-read-from-string (buffer-substring start end)))))
+      (delete-region start end)
+      (save-excursion
+        (goto-char start)
+        (insert (pp-to-string data))))))
 
-(defun json-sexp-convert-buffer-to-json ()
-  (unless (zerop (buffer-size))
-    (let ((data (car (read-from-string (buffer-string)))))
-      (erase-buffer)
-      (insert (let ((json-encoding-pretty-print t))
-                (json-encode data))))))
+(defun json-sexp-convert-region-to-json (start end)
+  "Convert region from sexps to JSON."
+  (interactive "r")
+  (unless (= start end)
+    (let ((data (car (read-from-string (buffer-substring start end)))))
+      (delete-region start end)
+      (save-excursion
+        (goto-char start)
+        (insert (let ((json-encoding-pretty-print t))
+                  (json-encode data)))))))
 
 (define-derived-mode json-sexp-mode emacs-lisp-mode "JSON-sexp"
   "Major mode for editing JSON in s-expression form.
 The buffer-contents, which must be JSON, are transformed to
 s-expressions when this mode is started, and transformed back
 temporarily to JSON whenever the buffer is saved."
-  (json-sexp-convert-buffer-to-sexp)
+  (json-sexp-convert-region-to-sexp (point-min) (point-max))
   (set-buffer-modified-p nil)
-  (add-hook 'before-save-hook 'json-sexp-convert-buffer-to-json nil t)
+  (add-hook 'before-save-hook 'json-sexp-before-save nil t)
   (add-hook 'after-save-hook 'json-sexp-after-save nil t))
 
+(defun json-sexp-before-save ()
+  (json-sexp-convert-region-to-json (point-min) (point-max)))
+
 (defun json-sexp-after-save ()
-  (json-sexp-convert-buffer-to-sexp)
+  (json-sexp-convert-region-to-sexp (point-min) (point-max))
   (set-buffer-modified-p nil))
 
 (defadvice json-read-object (around preserve-order)
