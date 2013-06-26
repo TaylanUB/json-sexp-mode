@@ -48,6 +48,16 @@
         (insert (let ((json-encoding-pretty-print t))
                   (json-encode data)))))))
 
+(defun json-sexp-convert-buffer-to-sexp ()
+  "Convert buffer from JSON to sexps."
+  (interactive)
+  (json-sexp-convert-region-to-sexp (point-min) (point-max)))
+
+(defun json-sexp-convert-buffer-to-json ()
+  "Convert buffer from sexps to JSON."
+  (interactive)
+  (json-sexp-convert-region-to-json (point-min) (point-max)))
+
 (define-derived-mode json-sexp-mode emacs-lisp-mode "JSON-sexp"
   "Major mode for editing JSON in s-expression form.
 The buffer-contents, which must be JSON, are transformed to
