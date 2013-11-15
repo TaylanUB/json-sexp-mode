@@ -66,10 +66,7 @@ temporarily to JSON whenever the buffer is saved."
   (json-sexp-convert-region-to-sexp (point-min) (point-max))
   (set-buffer-modified-p nil)
   (add-hook 'before-save-hook 'json-sexp-convert-buffer-to-json nil t)
-  (add-hook 'after-save-hook 'json-sexp-after-save nil t)
-  (when (featurep 'simple)
-    (auto-fill-mode -1)))
-
+  (add-hook 'after-save-hook 'json-sexp-after-save nil t))
 
 (defun json-sexp-after-save ()
   (json-sexp-convert-buffer-to-sexp)
