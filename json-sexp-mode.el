@@ -63,8 +63,9 @@
 The buffer-contents, which must be JSON, are transformed to
 s-expressions when this mode is started, and transformed back
 temporarily to JSON whenever the buffer is saved."
-  (json-sexp-convert-region-to-sexp (point-min) (point-max))
-  (set-buffer-modified-p nil)
+  (let ((was-modified (buffer-modified-p)))
+    (json-sexp-convert-buffer-to-sexp)
+    (set-buffer-modified-p was-modified))
   (add-hook 'before-save-hook 'json-sexp-convert-buffer-to-json nil t)
   (add-hook 'after-save-hook 'json-sexp-after-save nil t))
 
