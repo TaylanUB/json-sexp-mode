@@ -30,7 +30,9 @@
   "Convert region from JSON to sexps."
   (interactive "r")
   (unless (= start end)
-    (let ((data (let ((json-object-type 'plist))
+    (let ((data (let ((json-object-type 'plist)
+                      (json-false 'false)
+                      (json-null 'null))
                   (json-read-from-string (buffer-substring start end)))))
       (delete-region start end)
       (save-excursion
@@ -45,7 +47,9 @@
       (delete-region start end)
       (save-excursion
         (goto-char start)
-        (insert (let ((json-encoding-pretty-print t))
+        (insert (let ((json-encoding-pretty-print t)
+                      (json-false 'false)
+                      (json-null 'null))
                   (json-encode data)))))))
 
 (defun json-sexp-convert-buffer-to-sexp ()
