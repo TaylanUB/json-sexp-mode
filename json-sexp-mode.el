@@ -1,8 +1,8 @@
 ;;; json-sexp-mode.el --- Edit JSON in s-expression form.
 
-;; Copyright (C) 2013  Taylan Ulrich B.
+;; Copyright (C) 2013 - 2015  Taylan Ulrich Bayırlı/Kammer
 
-;; Author: Taylan Ulrich B. <taylanbayirli@gmail.com>
+;; Author: Taylan Ulrich Bayırlı/Kammer <taylanbayirli@gmail.com>
 ;; Keywords: data, files
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,21 @@
 
 ;;; Commentary:
 
-;; Depends on a version of json.el that supports pretty-printing.
-;; Recent Emacs versions have this, as of 2013-03.
+;; Depends on a version of json.el that supports the `json-nil' parameter.  To
+;; use your system's json.el, set `json-sexp-use-system-json' to t before
+;; loading this library; otherwise it will use the json.el that ships with it.
 
 ;;; Code:
 (require 'json)
+
+(defvar json-sexp-use-system-json nil
+  "Whether to use the system's json.el instead of the one
+shipping with this mode.  This should be set while loading the
+library; otherwise it will have no effect.  That means, if you're
+reading this docstring it's probably too late to change.")
+
+(unless json-sexp-use-system-json
+  (require 'json-sexp-mode-custom-json))
 
 (defun json-sexp-convert-region-to-sexp (start end)
   "Convert region from JSON to sexps."
@@ -32,7 +42,8 @@
   (unless (= start end)
     (let ((data (let ((json-object-type 'plist)
                       (json-false 'false)
-                      (json-null 'null))
+                      (json-null 'null)
+                      (json-nil 'object))
                   (json-read-from-string (buffer-substring start end)))))
       (delete-region start end)
       (save-excursion
@@ -49,7 +60,8 @@
         (goto-char start)
         (insert (let ((json-encoding-pretty-print t)
                       (json-false 'false)
-                      (json-null 'null))
+                      (json-null 'null)
+                      (json-nil 'object))
                   (json-encode data)))))))
 
 (defun json-sexp-convert-buffer-to-sexp ()
