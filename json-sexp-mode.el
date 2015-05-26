@@ -36,11 +36,14 @@ reading this docstring it's probably too late to change.")
 (unless json-sexp-use-system-json
   (require 'json-sexp-mode-custom-json))
 
+(defvar json-sexp-object-type 'alist
+  "The sexp type to use for JSON objects.")
+
 (defun json-sexp-convert-region-to-sexp (start end)
   "Convert region from JSON to sexps."
   (interactive "r")
   (unless (= start end)
-    (let ((data (let ((json-object-type 'plist)
+    (let ((data (let ((json-object-type json-sexp-object-type)
                       (json-false 'false)
                       (json-null 'null)
                       (json-nil 'object))
