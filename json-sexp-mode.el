@@ -20,21 +20,11 @@
 
 ;;; Commentary:
 
-;; Depends on a version of json.el that supports the `json-nil' parameter.  To
-;; use your system's json.el, set `json-sexp-use-system-json' to t before
-;; loading this library; otherwise it will use the json.el that ships with it.
+;; Depends on a version of json.el that supports the `json-nil' parameter, such
+;; as the one in this repository.
 
 ;;; Code:
 (require 'json)
-
-(defvar json-sexp-use-system-json nil
-  "Whether to use the system's json.el instead of the one
-shipping with this mode.  This should be set while loading the
-library; otherwise it will have no effect.  That means, if you're
-reading this docstring it's probably too late to change.")
-
-(unless json-sexp-use-system-json
-  (require 'json-sexp-mode-custom-json))
 
 (defvar json-sexp-object-type 'alist
   "The sexp type to use for JSON objects.")

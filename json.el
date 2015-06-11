@@ -630,6 +630,6 @@ Advances point just past JSON object."
           (txt (delete-and-extract-region begin end)))
       (insert (json-encode (json-read-from-string txt))))))
 
-(provide 'json-sexp-mode-custom-json)
+(provide 'json)
 
 ;;; json.el ends here
