@@ -1,3 +1,5 @@
-Edit JSON as s-expressions.  Depends on a version of json.el that
-supports pretty-printing.  Recent Emacs versions have this, as of
-2013-03.
+Edit JSON as S-expressions transparently
+========================================
+
+Depends on a version of json.el that supports the `json-nil`
+configuration variable, like the one in this repository.
