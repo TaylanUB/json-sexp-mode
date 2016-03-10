@@ -24,20 +24,16 @@
 ;; as the one in this repository.
 
 ;;; Code:
-(require 'json)
+(require 'jsxp)
 
-(defvar json-sexp-object-type 'alist
+(defvar json-sexp-object-type 'alist+
   "The sexp type to use for JSON objects.")
 
 (defun json-sexp-convert-region-to-sexp (start end)
   "Convert region from JSON to sexps."
   (interactive "r")
   (unless (= start end)
-    (let ((data (let ((json-object-type json-sexp-object-type)
-                      (json-false 'false)
-                      (json-null 'null)
-                      (json-nil 'object))
-                  (json-read-from-string (buffer-substring start end))))
+    (let ((data (jsxp-read-from-string (buffer-substring start end)))
           (point (point)))
       (delete-region start end)
       (goto-char start)
@@ -52,11 +48,8 @@
           (point (point)))
       (delete-region start end)
       (goto-char start)
-      (insert (let ((json-encoding-pretty-print t)
-                    (json-false 'false)
-                    (json-null 'null)
-                    (json-nil 'object))
-                (json-encode data)))
+      (insert (jsxp-encode data))
+      (insert "\n")
       (goto-char point))))
 
 (defun json-sexp-convert-buffer-to-sexp ()
@@ -83,24 +76,6 @@ temporarily to JSON whenever the buffer is saved."
 (defun json-sexp-after-save ()
   (json-sexp-convert-buffer-to-sexp)
   (set-buffer-modified-p nil))
-
-(defadvice json-read-object (around preserve-order)
-  "Preserve the order of key/value pairs when converting to an
-alist or plist."
-  (setq ad-return-value
-        (let ((object ad-do-it))
-          (cond
-           ((eq json-object-type 'alist)
-            (nreverse object))
-           ((eq json-object-type 'plist)
-            (let ((reversed nil))
-              (while object
-                (setq reversed (cons (car object)
-                                     (cons (cadr object) reversed)))
-                (setq object (cddr object)))
-              reversed))
-           (t
-            object)))))
 
 (provide 'json-sexp-mode)
 ;;; json-sexp-mode.el ends here
