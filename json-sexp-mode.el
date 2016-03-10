@@ -26,9 +26,6 @@
 ;;; Code:
 (require 'jsxp)
 
-(defvar json-sexp-object-type 'alist+
-  "The sexp type to use for JSON objects.")
-
 (defun json-sexp-convert-region-to-sexp (start end)
   "Convert region from JSON to sexps."
   (interactive "r")
