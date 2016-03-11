@@ -285,7 +285,7 @@ Returns the updated object, which you should save, e.g.:
               (mapcar (lambda (cons)
                         (format "%s%s: %s"
                                 jsxp--encoding-current-indentation
-                                (symbol-name (car cons))
+                                (jsxp-encode-string (symbol-name (car cons)))
                                 (jsxp-encode (cadr cons))))
                       table))
              ",")
