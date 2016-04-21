@@ -34,7 +34,7 @@
           (point (point)))
       (delete-region start end)
       (goto-char start)
-      (insert (pp-to-string data))
+      (json-sexp--pp data)
       (goto-char point))))
 
 (defun json-sexp-convert-region-to-json (start end)
@@ -48,6 +48,65 @@
       (insert (jsxp-encode data))
       (insert "\n")
       (goto-char point))))
+
+(defvar json-sexp--indent 0)
+
+(defun json-sexp--pp (data)
+  "Fast, specialized `pp' implementation."
+  (let ((json-sexp--indent (current-indentation)))
+    (json-sexp--pp-obj data)))
+
+(defun json-sexp--pp-obj (obj)
+  (cond
+   ((consp obj)
+    (insert "(")
+    (let ((json-sexp--indent (+ json-sexp--indent 1)))
+      (json-sexp--pp-list obj))
+    (insert ")"))
+   ((vectorp obj)
+    (insert "[")
+    (let ((json-sexp--indent (+ json-sexp--indent 1)))
+      (json-sexp--pp-vector obj))
+    (insert "]"))
+   (t
+    (prin1 obj (current-buffer)))))
+
+(defun json-sexp--pp-list (list)
+  (let ((split (catch 'break
+                 (dolist (obj list)
+                   (if (or (consp obj)
+                           (vectorp obj))
+                       (throw 'break t)))
+                 nil)))
+    (while list
+      (json-sexp--pp-obj (car list))
+      (setq list (cdr list))
+      (unless (null list)
+        (if split
+            (progn
+              (insert "\n")
+              (insert-char ?\s json-sexp--indent))
+          (insert " "))))))
+
+(defun json-sexp--pp-vector (vector)
+  (let ((split (catch 'break
+                 (let ((i 0))
+                   (while (< i (length vector))
+                     (if (or (consp (aref vector i))
+                             (vectorp (aref vector i)))
+                         (throw 'break t))
+                     (setq i (+ i 1)))
+                   nil))))
+    (let ((i 0))
+      (while (< i (length vector))
+        (json-sexp--pp-obj (aref vector i))
+        (setq i (+ i 1))
+        (unless (= i (length vector))
+          (if split
+              (progn
+                (insert "\n")
+                (insert-char ?\s json-sexp--indent))
+            (insert " ")))))))
 
 (defun json-sexp-convert-buffer-to-sexp ()
   "Convert buffer from JSON to sexps."
